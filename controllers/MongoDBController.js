@@ -1,15 +1,14 @@
 'use strict';
 
 const Kudos = require("./schema/Kudos");
+const rmq = require("../config/rabbitmq");
 const mongoose = require("mongoose");
 
 exports.list_kudos = (req, res, next) => {
     Kudos.find({},{idRemitente:1,nombreRemitente:1,idDestinatario:1,nombreDestinatario:1,tema:1})
         .exec()
         .then(docs => {
-           return res.status(200).json({
-                "kudos": docs
-            });
+            return res.status(200).json({ "kudos": docs });
         })
         .catch(err => {
             console.log(err);
@@ -29,11 +28,13 @@ exports.add_kudos = (req, res, next) => {
         texto: req.body.texto             
     });
 
+     //create message update
+    var message =  JSON.stringify({idRemitente: req.body.idRemitente});
+
     item.save()
          .then(result => {
-                res.status(200).json({
-                    kudos:[item]
-                });
+                rmq.sendMessage('update', message);
+                res.status(200).json({ kudos:[item] });
           })
          .catch(err => {
             console.log(err);
@@ -42,10 +43,14 @@ exports.add_kudos = (req, res, next) => {
 
 exports.del_kudos = (req, res, next) => {
     const id = parseInt(req.params.id, 10);
+    
+     //create message update
+     var message =  JSON.stringify({idRemitente: req.params.id});
                 
     Kudos.deleteOne({idRemitente:id})
         .exec()
         .then(docs => {
+            rmq.sendMessage('delete', message);
             res.status(200).json( { deleted:true });
         })
         .catch(err => {
