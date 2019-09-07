@@ -1,7 +1,8 @@
 'use strict';
 
+const mongodb = require("../config/MongoDBdatabase");
 const Kudos = require("./schema/Kudos");
-const rmq = require("../config/rabbitmq");
+const rmq = require("./RabbitMQController");
 const mongoose = require("mongoose");
 
 exports.list_kudos = (req, res, next) => {
@@ -29,11 +30,12 @@ exports.add_kudos = (req, res, next) => {
     });
 
      //create message update
-    var message =  JSON.stringify({operation: "update", idRemitente: req.body.idRemitente});
+     const id = parseInt(req.body.idRemitente, 10);
+    var message =  JSON.stringify({operation: "add", idRemitente: id});
 
     item.save()
          .then(result => {
-                rmq.sendMessage('update', message);
+                rmq.sendMessage(message);
                 res.status(200).json({ kudos:[item] });
           })
          .catch(err => {
@@ -50,7 +52,7 @@ exports.del_kudos = (req, res, next) => {
     Kudos.deleteOne({idRemitente:id})
         .exec()
         .then(docs => {
-            rmq.sendMessage('delete', message);
+            rmq.sendMessage(message);
             res.status(200).json( { deleted:true });
         })
         .catch(err => {
