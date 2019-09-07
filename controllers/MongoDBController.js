@@ -29,7 +29,7 @@ exports.add_kudos = (req, res, next) => {
     });
 
      //create message update
-    var message =  JSON.stringify({idRemitente: req.body.idRemitente});
+    var message =  JSON.stringify({operation: "update", idRemitente: req.body.idRemitente});
 
     item.save()
          .then(result => {
@@ -45,7 +45,7 @@ exports.del_kudos = (req, res, next) => {
     const id = parseInt(req.params.id, 10);
     
      //create message update
-     var message =  JSON.stringify({idRemitente: req.params.id});
+     var message =  JSON.stringify({operation: "delete", idRemitente: id});
                 
     Kudos.deleteOne({idRemitente:id})
         .exec()
