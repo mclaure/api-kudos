@@ -6,7 +6,7 @@ const rmq = require("./RabbitMQController");
 const mongoose = require("mongoose");
 
 exports.list_kudos = (req, res, next) => {
-    Kudos.find({},{idRemitente:1,nombreRemitente:1,idDestinatario:1,nombreDestinatario:1,tema:1})
+    Kudos.find({},{_id:1, idRemitente:1, idDestinatario:1, tema:1})
         .exec()
         .then(docs => {
             return res.status(200).json({ "kudos": docs });
@@ -20,9 +20,7 @@ exports.add_kudos = (req, res, next) => {
     const item = new Kudos({
         _id: mongoose.Types.ObjectId(),
         idRemitente: req.body.idRemitente,
-        nombreRemitente: req.body.nombreRemitente,
         idDestinatario: req.body.idDestinatario,                
-        nombreDestinatario:req.body.nombreDestinatario,
         fecha: req.body.fecha,
         lugar: req.body.lugar,    
         tema: req.body.tema,      

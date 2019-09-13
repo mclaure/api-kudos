@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-mongoose.connect("mongodb://localhost:27017/kudos"
+mongoose.connect("mongodb://svc:Password123@localhost:27017/kudos"
                 ,{ 
                     useNewUrlParser: true 
                 });
